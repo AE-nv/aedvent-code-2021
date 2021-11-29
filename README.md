@@ -7,7 +7,7 @@ Advent of Code is a series of small programming puzzles for a variety of skill l
 ## AE Leaderboard (! new leaderboard !)
 To join the AE Leaderboard, check the Software Crafters Teams channel for the join code.
 
-AE Leaderboard: TODO
+[AE Leaderboard](https://adventofcode.com/2021/leaderboard/private/view/148156)
 
 Folder Structure
 Add your submission as YourName - Language in the directory for that day (example: day 01/Joske - JavaScript)

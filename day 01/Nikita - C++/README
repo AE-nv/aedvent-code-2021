@@ -1,0 +1,6 @@
+You'll need to compile the scripts with g++. 
+To execute any of the scripts simply run .\AdventOfCode1 or .\AdventOfCode2
+you need minGW64 g++ compiler to actually run the pasta code.
+A readable version was provided in the second cpp file
+You can run your own results through the pasta code by replacing the sonarreading file or the values within the file. 
+My results were 1226 and 1252.

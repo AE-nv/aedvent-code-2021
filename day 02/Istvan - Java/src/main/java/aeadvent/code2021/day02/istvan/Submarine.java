@@ -2,12 +2,12 @@ package aeadvent.code2021.day02.istvan;
 
 import java.util.Objects;
 
-public class SubmarinePosition {
+public class Submarine {
 
     private int horizontal;
     private int depth;
 
-    public SubmarinePosition() {
+    public Submarine() {
         horizontal = 0;
         depth = 0;
     }
@@ -20,9 +20,9 @@ public class SubmarinePosition {
         return depth;
     }
 
-    public SubmarinePosition move (final MoveInstruction moveInstruction) {
+    public Submarine move (final MoveInstruction moveInstruction) {
         Objects.requireNonNull(moveInstruction, "Instruction can't be null");
-        final int distance = moveInstruction.distance();
+        final int distance = moveInstruction.units();
         switch(moveInstruction.direction()) {
             case DOWN -> moveDown(distance);
             case UP -> moveUp(distance);
@@ -31,19 +31,15 @@ public class SubmarinePosition {
         return this;
     }
 
-    public SubmarinePosition move(final int distance, final Direction direction) {
-        return move (new MoveInstruction(distance, direction));
-    }
-
-    private void moveForward(int distance) {
+    protected void moveForward(int distance) {
         this.horizontal += distance;
     }
 
-    private void moveDown(int distance) {
+    protected void moveDown(int distance) {
         this.depth += distance;
     }
 
-    private void moveUp(final int distance) {
+    protected void moveUp(final int distance) {
         this.depth -= distance;
         if (this.depth < 0)
             this.depth = 0;
@@ -51,6 +47,6 @@ public class SubmarinePosition {
 
     @Override
     public String toString() {
-        return String.format("SubmarinePostion at %d horizontal and depth %d", this.horizontal, this.depth);
+        return String.format("Submarine at %d horizontal and depth %d", this.horizontal, this.depth);
     }
 }

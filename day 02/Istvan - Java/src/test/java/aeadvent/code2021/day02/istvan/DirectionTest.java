@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static aeadvent.code2021.day02.istvan.Direction.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Fail.fail;
 
 class DirectionTest {
 

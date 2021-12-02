@@ -8,15 +8,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static aeadvent.code2021.day02.istvan.Direction.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Fail.fail;
 
-public class SubmarinePositionTest {
+public class SubmarineTest {
 
-    private final SubmarinePosition position = new SubmarinePosition();
+    private final Submarine position = new Submarine();
 
     @Test
     @DisplayName("Starting position is at 0 horizontal")
-    void startingPostionIsAtZeroHorizontal() {
+    void startingPositionIsAtZeroHorizontal() {
         assertThat(position.getHorizontal()).isEqualTo(0);
     }
 
@@ -34,7 +33,7 @@ public class SubmarinePositionTest {
     }
 
     @Test
-    void multipleMovesAccumlateHorizontalPosition() {
+    void multipleMovesAccumulateHorizontalPosition() {
         assertThat(
                 position.move(new MoveInstruction(3, FORWARD))
                         .move(new MoveInstruction(5, FORWARD))

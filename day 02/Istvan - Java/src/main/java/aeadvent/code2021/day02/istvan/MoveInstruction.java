@@ -2,12 +2,10 @@ package aeadvent.code2021.day02.istvan;
 
 import java.util.Objects;
 
-public record MoveInstruction(int distance, Direction direction) {
+public record MoveInstruction(int units, Direction direction) {
 
-    public MoveInstruction(int distance, Direction direction) {
+    public MoveInstruction {
         Objects.requireNonNull(direction, "Direction can't be null");
-        this.distance = distance;
-        this.direction = direction;
     }
 
     static MoveInstruction fromString(String movementString) {

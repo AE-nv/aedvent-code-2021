@@ -1,5 +1,3 @@
-import os
-print(os.getcwd())
 # instructions_parsed = [[instruction.split(' ')[0], int(instruction.split(' ')[1])] for instruction in open('day 02\Martijn - Python\input.txt').readlines()]
 instructions_parsed = [[instruction, int(nb)] for [instruction,nb] in [line.split() for line in open('day 02\Martijn - Python\input.txt').readlines()]] #slightly more clean solution of Toon
 

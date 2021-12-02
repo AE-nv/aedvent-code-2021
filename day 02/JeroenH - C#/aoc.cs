@@ -2,7 +2,10 @@ var input = File.ReadAllLines("input.txt");
 var regex = new Regex(@"(?<direction>\w+) (?<value>\d+)", RegexOptions.Compiled);
 var instructions = (
     from s in input
-    where !string.IsNullOrEmpty(s)let m = regex.Match(s)select new Instruction(m.Groups["direction"].Value, int.Parse(m.Groups["value"].Value))).ToImmutableArray();
+    where !string.IsNullOrEmpty(s)
+    let m = regex.Match(s)
+    select new Instruction(m.Groups["direction"].Value, int.Parse(m.Groups["value"].Value))
+).ToImmutableArray();
 
 var part1 = instructions.Aggregate(new Pos(0, 0), (p, i) => i.direction[0] switch
 {

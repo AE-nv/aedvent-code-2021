@@ -31,7 +31,7 @@ class PowerConsumptionCalculator {
     calculateBinaryValue(most) {
         return this.addAllValues()
             .split(" ")
-            .map(d => d > this.data.length / 2 ? most ? 1 : 0 : most ? 0 : 1)
+            .map(d => most ? d >= this.data.length / 2 ? 1 : 0 : d <= this.data.length / 2 ? 1 : 0)
             .join("");
     }
 

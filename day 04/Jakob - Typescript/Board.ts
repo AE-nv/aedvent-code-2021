@@ -2,6 +2,8 @@ export class Board {
   size: number;
   values: number[][];
   marked: number[][] = [];
+  bingoAfterTurns: number;
+  score: number;
 
   constructor(values: number[][], size: number) {
     this.values = values;

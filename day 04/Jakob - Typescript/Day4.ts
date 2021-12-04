@@ -35,19 +35,14 @@ function parseLine(line: string): number[] {
 // play the game
 
 for (let i in values) {
-  let bingo: boolean = false;
   boards.forEach((board) => {
     board.markValue(values[i]);
-    if (board.isBingo()) {
-      const sumRemaining = board.sumRemaining();
-      console.log("Bingo! Used " + i + " turns");
-      console.log("Sum remaining: " + sumRemaining);
-      console.log("Value: " + values[i]);
-      console.log("Score: " + values[i] * sumRemaining);
-      bingo = true;
+    if (board.isBingo() && board.bingoAfterTurns == null) {
+      board.bingoAfterTurns = parseInt(i);
+      board.score = board.sumRemaining() * values[i];
     }
   });
-  if (bingo) {
-    break;
-  }
 }
+
+boards.sort((a, b) => b.bingoAfterTurns - a.bingoAfterTurns); // inverse sort
+console.log(boards[0]);

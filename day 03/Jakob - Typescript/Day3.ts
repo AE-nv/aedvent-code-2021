@@ -1,3 +1,5 @@
+export {};
+
 const fs = require("fs");
 const text: string = fs.readFileSync("./input.txt", "utf-8");
 const textByLine: string[] = text.split("\n");

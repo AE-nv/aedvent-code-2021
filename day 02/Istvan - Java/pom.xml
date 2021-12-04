@@ -9,7 +9,6 @@
     <junit-jupiter.version>5.8.2</junit-jupiter.version>
     <assertj-core.version>3.21.0</assertj-core.version>
   </properties>
-  <name>day24-istvan</name>
   <dependencies>
     <dependency>
   <groupId>org.junit.jupiter</groupId>

@@ -1,6 +1,6 @@
 import sys
 
-def day1(lines):
+def solve(lines):
   horizontal_position = 0
   depth = 0
 
@@ -19,5 +19,5 @@ def day1(lines):
   return horizontal_position * depth
 
 with open('input.txt') as file:
-  result = day1(file.readlines())
+  result = solve(file.readlines())
   print(result)

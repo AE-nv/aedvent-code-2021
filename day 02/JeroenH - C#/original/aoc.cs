@@ -1,5 +1,27 @@
-var ins=from s in ReadAllLines("input.txt") let m=new Regex(@"(\w+) (\d+)").Match(s) select(d: m.Groups[1].Value,v:Parse(m.Groups[2].Value));
-var p=ins.Aggregate(new P(0,0),(p,i)=>i.d[0]switch{'f'=>new(p.x+i.v,p.y),'u'=>new(p.x,p.y-i.v),'d'=>new(p.x,p.y+i.v)}).V;
-var q=ins.Aggregate((p:new P(0,0),a:0),(t,i)=>i.d[0]switch{'f'=>(new(t.p.x+i.v,t.p.y+t.a*i.v),t.a),'u'=>(t.p,t.a-i.v),'d'=>(t.p,t.a+i.v)}).p.V;
-WriteLine((p,q));
-record P(int x,int y){public int V=>x*y;}
+var input = File.ReadAllLines("input.txt");
+var regex = new Regex(@"(?<direction>\w+) (?<value>\d+)", RegexOptions.Compiled);
+var instructions = (
+    from s in input
+    where !string.IsNullOrEmpty(s)
+    let m = regex.Match(s)
+    select new Instruction(m.Groups["direction"].Value, int.Parse(m.Groups["value"].Value))).ToImmutableArray();
+var part1 = instructions.Aggregate(new Pos(0, 0), (p, i) => i.direction[0] switch
+{
+    'f' => new(p.x + i.value, p.y),
+    'u' => new(p.x, p.y - i.value),
+    'd' => new(p.x, p.y + i.value),
+    _ => throw new Exception()
+}).Value;
+var part2 = instructions.Aggregate((p: new Pos(0, 0), aim: 0), (t, i) => i.direction[0] switch
+{
+    'f' => (new(t.p.x + i.value, t.p.y + t.aim * i.value), t.aim),
+    'u' => (t.p, t.aim - i.value),
+    'd' => (t.p, t.aim + i.value),
+    _ => throw new Exception()
+}).p.Value;
+Console.WriteLine((part1, part2));
+readonly record struct Instruction(string direction, int value);
+readonly record struct Pos(int x, int y)
+{
+    public long Value => x * y;
+}

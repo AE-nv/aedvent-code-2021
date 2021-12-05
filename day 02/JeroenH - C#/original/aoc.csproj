@@ -14,10 +14,7 @@
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.RegularExpressions" />
     <Using Include="System.Collections.Immutable" />
-	  <Using Include="System.Console" Static="true" />
-	  <Using Include="System.Math" Static="true" />
-    <Using Include="System.IO.File" Static="true" />
-  <Using Include="System.Int32" Static="true" />
+    <Using Include="System.Linq.Enumerable" Static="true" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="6.0.1" />

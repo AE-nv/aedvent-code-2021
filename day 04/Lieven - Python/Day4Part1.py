@@ -1,3 +1,6 @@
+# Python2.7
+# O(n1*n2) where n1 = number of drawn numbers, n2 = number of playing boards
+
 import numpy as np
 
 # Class representing a playing board
@@ -6,14 +9,12 @@ class Board:
         self.boardId = boardId
         self.rows = [0 for _ in range(nbRows)]
         self.columns = [0 for _ in range(nbCols)]
-        self.bingoReached = False
         self.boardCoordinates = []
     
     def markCoordinate(self, row, col):
         self.rows[row] += 1
         self.columns[col] += 1
         if (self.rows[row] == len(self.columns) or self.columns[col] == len(self.rows)):
-            self.bingoReached = True
             return True
         return False
     
@@ -61,10 +62,8 @@ def getBoards(lines):
 # Returns: HashMap<int,BoardCoordinate[]>
 def initializeBoardCoordinates(boards):
     numberToBoardCoordinates = dict()
-    boardObjects = []
     for idx,board in enumerate(boards):
         boardObject = Board(idx,len(board[0]),len(board))
-        boardObjects.append(boardObject)
         for rowIdx,row in enumerate(board):
             for colIdx,val in enumerate(row):
                 boardCoordinate = BoardCoordinate(rowIdx,colIdx,val,boardObject)
@@ -74,7 +73,7 @@ def initializeBoardCoordinates(boards):
                 else:
                     numberToBoardCoordinates[val] = [boardCoordinate]
     
-    return (boardObjects,numberToBoardCoordinates)
+    return numberToBoardCoordinates
                 
 # Calculates the winner's score after bingo has been found for a board
 def calculateScore(lastNumberDrawn, winningBoard):
@@ -92,22 +91,23 @@ lines = file.readlines()
 drawnNumbers = map(int, filterNewlines(lines[0]).split(","))
 boards = getBoards(lines[2:])
 # HashMap<int,BoardCoordinate[]>
-boardObjects,numberToBoardCoordinates = initializeBoardCoordinates(boards)
-winnerBoardsInOrder = []
+numberToBoardCoordinates = initializeBoardCoordinates(boards)
+winnerBoard = None
 lastNumberDrawn = -1
 winnerScore = -1
 
 for drawnNumber in drawnNumbers:
-    if (len(winnerBoardsInOrder) == len(boardObjects)):
+    if (winnerBoard != None):
         break
     
     lastNumberDrawn = drawnNumber
     for boardCoordinate in numberToBoardCoordinates[drawnNumber]:
-        if (not boardCoordinate.board.bingoReached and boardCoordinate.markNum()):
-            winnerBoardsInOrder.append(boardCoordinate.board)
+        if (boardCoordinate.markNum()):
+            winnerBoard = boardCoordinate.board
+            break
 
-winnerScore = calculateScore(lastNumberDrawn,winnerBoardsInOrder[-1])
-print("Winning board is board number {} with a score of {}".format(winnerBoardsInOrder[-1].boardId, winnerScore))
+winnerScore = calculateScore(lastNumberDrawn,winnerBoard)
+print("Winning board is board number {} with a score of {}".format(winnerBoard.boardId, winnerScore))
 
 
 

@@ -1,11 +1,11 @@
-﻿internal record Point(int X, int Y)
-{
-};
+﻿internal record Point(int X, int Y);
 internal record Line
 {
     public Point start;
     public Point end;
 
+    public int MaxX => start.X > end.X ? start.X : end.X;
+    public int MaxY => start.Y > end.Y ? start.Y : end.Y;
     public Line(string x)
     {
         var s = x.Split(" -> ");
@@ -16,47 +16,30 @@ internal record Line
     public IEnumerable<Point> GetCoverage(bool diagonal)
     {
         int index = 0;
-        int indexDirection = 1;
+        int xMultiplier = start.X > end.X ? -1 : 1;
+        int yMultiplier = start.Y > end.Y ? -1 : 1;
         if (diagonal && start.X != end.X && start.Y != end.Y)
         {
-            int indexDirectionX = 1;
-            int indexDirectionY = 1;
-            if (start.Y + index >= end.Y)
+            while (start.Y + yMultiplier * index != end.Y + 1 * yMultiplier)
             {
-                indexDirectionY = -1;
+                yield return new Point(start.X + xMultiplier * index, start.Y + yMultiplier * index++);
             }
-            if (start.X + index >= end.X)
-            {
-                indexDirectionX = -1;
-            }
-            while (start.Y + indexDirectionY * index != end.Y + 1 * indexDirectionY)
-            {
-                yield return new Point(start.X + indexDirectionX * index, start.Y + indexDirectionY * index++);
-            }
-
         }
         if (start.X == end.X)
         {
-            if (start.Y + index >= end.Y)
+            while (start.Y + index * yMultiplier != end.Y + 1 * yMultiplier)
             {
-                indexDirection = -1;
-            }
-            while (start.Y + index * indexDirection != end.Y + 1 * indexDirection)
-            {
-                yield return new Point(start.X, start.Y + indexDirection * index++);
+                yield return new Point(start.X, start.Y + yMultiplier * index++);
             }
         }
         if (start.Y == end.Y)
         {
-            if (start.X + index >= end.X)
+            while (start.X + index * xMultiplier != end.X + 1 * xMultiplier)
             {
-                indexDirection = -1;
-            }
-            while (start.X + index * indexDirection != end.X + 1 * indexDirection)
-            {
-                yield return new Point(start.X + indexDirection * index++, start.Y);
+                yield return new Point(start.X + xMultiplier * index++, start.Y);
             }
         }
+
     }
 
 }

@@ -1,51 +1,39 @@
-﻿namespace day04
+﻿internal record Number(string Val)
 {
-    internal record Number
+    public bool Found = false;
+};
+
+internal class Board
+{
+    public List<List<Number>> Numbers { get; set; }
+
+    public Board(IEnumerable<string> boardNumbers)
     {
-        public string Val;
-
-        public Number(string val)
-        {
-            Val = val;
-        }
-
-        public bool Found = false;
+        Numbers = boardNumbers.Select(x => x.Split(" ").Select(y => new Number(y)).ToList()).ToList();
+        Numbers.AddRange(Enumerable.Range(0, boardNumbers.Count())
+            .Select(x => boardNumbers.Select(y => y.Split(" ")[x]).Select(y => new Number(y)).ToList()).ToList());
     }
-    internal class Board
+
+
+    internal void Update(string nr)
     {
-        public List<List<Number>> HorizontalNumbers { get; set; }
-        public List<List<Number>> VerticalNumbers { get; set; }
+        Numbers.ForEach(row => row.ForEach(n => { if (n.Val.Equals(nr)) n.Found = true; }));
+    }
 
-        public Board(IEnumerable<string> boardNumbers)
+    public int NumbersLeftSum
+    {
+        get
         {
-            HorizontalNumbers = boardNumbers.Select(x => x.Trim().Replace("  ", " ").Split(" ").Select(y => new Number(y)).ToList()).ToList();
-            VerticalNumbers = Enumerable.Range(0, boardNumbers.Count())
-                .Select(x => boardNumbers.Select(y => y.Trim().Replace("  ", " ").Split(" ")[x]).Select(y => new Number(y)).ToList()).ToList();
+            return Numbers.Select(x => x.Where(y => !y.Found)).SelectMany(r => r).Select(x => x.Val).Select(x => int.Parse(x)).Sum() / 2;
         }
+    }
 
-
-        internal void Update(string nr)
+    public bool IsComplete
+    {
+        get
         {
-            HorizontalNumbers.ForEach(row => row.ForEach(n => { if (n.Val.Equals(nr)) n.Found = true; }));
-            VerticalNumbers.ForEach(row => row.ForEach(n => { if (n.Val.Equals(nr)) n.Found = true; }));
-        }
-
-        public List<string> NumbersLeft
-        {
-            get
-            {
-                //Only count horizontal since we copied all results to vertical aswell
-                return HorizontalNumbers.Select(x => x.Where(y => !y.Found)).SelectMany(r => r).Select(x => x.Val).ToList();
-            }
-        }
-
-        public bool IsComplete
-        {
-            get
-            {
-                return HorizontalNumbers.Any(x => x.Count(y => y.Found) == HorizontalNumbers.Count)
-                    || VerticalNumbers.Any(x => x.Count(y => y.Found) == VerticalNumbers.Count);
-            }
+            return Numbers.Any(x => x.Count(y => y.Found) == Numbers[0].Count);
         }
     }
 }
+

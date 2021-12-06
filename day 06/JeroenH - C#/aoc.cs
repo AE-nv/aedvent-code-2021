@@ -10,14 +10,14 @@ long CountFish(int iterations)
         noffish[n]++;
     for (int i = 0; i < iterations; i++)
     {
-        var age6 = noffish[0];
+        var age0 = noffish[0];
         for (int age = 1; age < 9; age++)
         {
             noffish[age - 1] = noffish[age];
         }
 
-        noffish[6] += age6;
-        noffish[8] = age6;
+        noffish[6] += age0;
+        noffish[8] = age0;
     }
 
     return noffish.Sum();

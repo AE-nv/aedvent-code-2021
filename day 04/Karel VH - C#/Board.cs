@@ -24,7 +24,7 @@ internal class Board
     {
         get
         {
-            return Numbers.Select(x => x.Where(y => !y.Found)).SelectMany(r => r).Select(x => x.Val).Select(x => int.Parse(x)).Sum() / 2;
+            return Numbers.Select(x => x.Where(y => !y.Found)).SelectMany(r => r).Select(x => x.Val).Select(int.Parse).Sum() / 2;
         }
     }
 

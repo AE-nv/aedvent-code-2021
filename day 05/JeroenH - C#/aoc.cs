@@ -3,7 +3,7 @@ var lines = input.Select(Line.Parse).ToImmutableArray();
 var part1 = CountOverlaps(lines.Where(l => l.IsStraightLine));
 var part2 = CountOverlaps(lines);
 Console.WriteLine((part1, part2));
-int CountOverlaps(IEnumerable<Line> lines) => lines.SelectMany(l => l.Points()).GroupBy(p => p).Select(g => g.Count()).Where(c => c >= 2).Sum();
+int CountOverlaps(IEnumerable<Line> lines) => lines.SelectMany(l => l.Points()).GroupBy(p => p).Select(g => g.Count()).Where(c => c >= 2).Count();
 readonly record struct Line(Point from, Point to)
 {
     static Regex regex = new Regex(@"(?<x1>\d+),(?<y1>\d+) -> (?<x2>\d+),(?<y2>\d+)");

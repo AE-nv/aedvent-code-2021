@@ -1,7 +1,7 @@
 contains[s2_][s1_] := SubsetQ[s1, s2]
 takeDrop[s_, f_] := {#, DeleteCases[s, #]} &@SelectFirst[s, f]
-decode[{rIn, rOut}] := Module[{rowIn},
-  rowIn = SortBy[in, Length];
+decode[{rIn_, rOut_}] := Module[{rowIn},
+  rowIn = SortBy[rIn, Length];
   {one, seven, four, eight} = rowIn[[{1, 2, 3, -1}]];
   twoThreeFive = rowIn[[{4, 5, 6}]];
   zeroSixNine = rowIn[[{7, 8, 9}]];

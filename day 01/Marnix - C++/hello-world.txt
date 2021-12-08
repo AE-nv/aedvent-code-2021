@@ -1,0 +1,13 @@
+hello world 
+
+
+README:
+1. input in hello-world.txt
+2. source code in hello-world.cpp
+3. executable also included. Called hello-world.
+4. run executable. be amazed. hello-world.
+
+No idea what else to say.
+
+
+hello world

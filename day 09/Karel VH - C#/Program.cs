@@ -1,13 +1,12 @@
-﻿List<List<int>> input = File.ReadAllLines("input.txt").Select(x => (x.ToCharArray().Select(x => int.Parse(x.ToString()))).ToList()).ToList();
+﻿var input = File.ReadAllLines("input.txt").Select(x => x.Select(x => int.Parse(x.ToString())).ToList()).ToList();
 
 List<(int X, int Y)> lowPoints = new();
 List<List<(int X, int Y)>> basins = new();
 
-IEnumerable<(int X, int Y)> GetNeighbors((int X, int Y) point)
+IEnumerable<(int X, int Y)> GetNeighbors((int X, int Y) p)
 {
-    List<(int X, int Y)> distance = new() { (0, 1), (0, -1), (1, 0), (-1, 0) };
-    return distance.Select(x => (x.X + point.X, x.Y + point.Y))
-        .Where(x => x.Item1 > -1 && x.Item2 > -1 && x.Item1 < input.Count && x.Item2 < input[x.Item1].Count);
+    return new List<(int X, int Y)> { (0, 1), (0, -1), (1, 0), (-1, 0) }.Select(x => (X: x.X + p.X, Y: x.Y + p.Y))
+        .Where(n => n.X > -1 && n.Y > -1 && n.X < input.Count && n.Y < input[n.X].Count);
 }
 
 for (int i = 0; i < input.Count; i++)
@@ -17,37 +16,26 @@ for (int i = 0; i < input.Count; i++)
         if (!GetNeighbors((i, j)).Any(n => input[n.X][n.Y] <= input[i][j]))
         {
             lowPoints.Add((i, j));
-
-            List<(int X, int Y)> result = new();
-            result.Add((i, j));
-            basins.Add(addToListIfLower(i, j, result));
+            basins.Add(addToListIfLower(i, j, new List<(int, int)> { (i, j) }));
         }
     }
 }
 
-List<(int X, int Y)> addToListIfLower(int i, int j, List<(int X, int Y)> result)
+List<(int, int)> addToListIfLower(int i, int j, List<(int X, int Y)> res)
 {
-    IEnumerable<(int X, int Y)> lowerLocations = GetNeighbors((i, j)).Where(x => input[i][j] < input[x.X][x.Y]);
-
-    if (lowerLocations.Any())
+    IEnumerable<(int X, int Y)> lowers = GetNeighbors((i, j)).Where(x => input[i][j] < input[x.X][x.Y]);
+    if (lowers.Any())
     {
-        foreach (var k in lowerLocations)
+        foreach (var (X, Y) in lowers)
         {
-            if (input[k.X][k.Y] != 9)
+            if (input[X][Y] != 9 && !res.Any(r => r.X == X && r.Y == Y))
             {
-                if (!result.Any(result => result.X == k.X && result.Y == k.Y))
-                {
-                    result.Add((k.X, k.Y));
-                    addToListIfLower(k.X, k.Y, result);
-                }
+                res.Add((X, Y));
+                addToListIfLower(X, Y, res);
             }
         }
     }
-    return result;
+    return res;
 }
 
-Console.WriteLine(lowPoints.Select(x => input[x.X][x.Y]).Sum() + lowPoints.Count);
-Console.WriteLine(basins.OrderByDescending(x => x.Count).Take(3).Select(x => x.Count).Aggregate(1, (x, y) => x * y));
-
-// 494
-//1048128
+Console.WriteLine((lowPoints.Select(x => input[x.X][x.Y]).Sum() + lowPoints.Count, basins.OrderByDescending(x => x.Count).Take(3).Select(x => x.Count).Aggregate(1, (x, y) => x * y)));

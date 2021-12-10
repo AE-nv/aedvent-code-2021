@@ -1,6 +1,4 @@
-var input = File.ReadAllLines("input.txt");
-
-var grid = new Grid(input);
+var grid = new Grid(File.ReadAllLines("input.txt"));
 
 var part1 = (
     from p in grid.Points()
@@ -40,20 +38,21 @@ class Grid
     public IEnumerable<Point> Basin(Point p)
     {
         yield return p;
-        foreach (var n in Neighbours(p).Where(n => this[n] > this[p] && this[n] < 9))
-        {
-            foreach (var x in Basin(n))
-                yield return x;
-        }
+
+        var q = from n in Neighbours(p) 
+                where this[n] > this[p] && this[n] < 9
+                from b in Basin(n)
+                select b;
+
+        foreach (var n in q) yield return n;
     }
 
     public IEnumerable<Point> Points() =>
-        from x in Range(origin.x, length.x) from y in Range(origin.y, length.y) select new Point(x, y);
-    public IEnumerable<Point> Neighbours(Point p)
-    {
-        if (p.x > origin.x) yield return p with { x = p.x - 1 };
-        if (p.y < length.y - 1) yield return p with { y = p.y + 1 };
-        if (p.y > origin.y) yield return p with { y = p.y - 1 };
-        if (p.x < length.x - 1) yield return p with { x = p.x + 1 };
-    }
+        from x in Range(origin.x, length.x) 
+        from y in Range(origin.y, length.y) 
+        select new Point(x, y);
+    public IEnumerable<Point> Neighbours(Point p) => 
+        from d in new (int x, int y)[] { (-1, 0), (0, 1), (1, 0), (0, -1) }
+        where (p.x + d.x, p.y + d.y) is (>= 0 and < 100, >= 0 and < 100)  
+        select new Point(p.x + d.x, p.y + d.y);
 }

@@ -1,4 +1,3 @@
-from collections import Counter
 file = open("day 08/Toon D - Python/input", "r")
 lines = file.readlines()
 

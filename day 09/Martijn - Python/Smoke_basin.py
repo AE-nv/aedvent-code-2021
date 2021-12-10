@@ -60,7 +60,6 @@ def find_bassin_rec(row, column, matrix):
         if neighbour > current and neighbour != 9:
             result.append((neighbour_index[0], neighbour_index[1]))
             result += find_bassin_rec(neighbour_index[0], neighbour_index[1], matrix)
-        
     return result
 
 if __name__ == '__main__':

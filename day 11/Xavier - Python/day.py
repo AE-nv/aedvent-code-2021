@@ -18,12 +18,12 @@ def flash(map, x, y):
 def step(map):
     flashes = 0
     map = [[x+1 for x in line] for line in map]
-    locs = [(i,j) for i in range(len(map)) for j in range(len(map)) if map[i][j] > 9]
-    while(len(locs)>0):
-        flashes += len(locs)
-        for l in locs:
+    flashed = [(i,j) for i in range(len(map)) for j in range(len(map)) if map[i][j] > 9]
+    while(len(flashed)>0):
+        flashes += len(flashed)
+        for l in flashed:
             map = flash(map, *l)
-        locs = [(i,j) for i in range(len(map)) for j in range(len(map)) if map[i][j] > 9]
+        flashed = [(i,j) for i in range(len(map)) for j in range(len(map)) if map[i][j] > 9]
     return map, flashes
 
 def p1(map):

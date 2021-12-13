@@ -3,25 +3,26 @@ using Set = System.Collections.Immutable.ImmutableHashSet<Coordinate>;
 var input = File.ReadAllLines("input.txt");
 
 var grid = new Grid(
-        from line in input
+    from line in input
         let c = Coordinate.TryParse(line)
         where c.HasValue
         select c.Value
     );
 
 var instructions =
-        from line in input
+    from line in input
         let i = Instruction.TryParse(line)
         where i.HasValue
         select i.Value;
 
 var part1 = FoldingCycle(grid, instructions).First().Count();
+var part2 = FoldingCycle(grid, instructions).Last().ToString().DecodeImage(5);
 
 var part2 = FoldingCycle(grid, instructions).Last().ToString().DecodePixels(5);
 
 Console.WriteLine((part1, part2));
 
-IEnumerable<Grid> FoldingCycle(Grid grid, IEnumerable<Instruction> instructions)
+static IEnumerable<Grid> FoldingCycle(Grid grid, IEnumerable<Instruction> instructions)
 {
     foreach (var (c, value) in instructions)
     {
@@ -71,7 +72,7 @@ class Grid
         => (from d in Range(1, size.x - v)
             from y in Range(0, size.y)
             where coordinates.Contains(new(d + v, y))
-            select (d, y)
+            select (d, y) 
             ).Aggregate(coordinates, (c, t) => c.Remove(new(v + t.d, t.y)).Add(new(v - t.d, t.y)));
 
     internal int Count() => points.Count;
@@ -94,8 +95,10 @@ record struct Instruction(char c, int v)
         var match = regex.Match(s);
         return match.Success ? new Instruction(match.Groups["c"].ValueSpan[0], int.Parse(match.Groups["v"].ValueSpan)) : null;
     }
+
 }
 
+// utility class to decode the 'pixel font' (as allocation-free as possible ;-))
 static class PixelFontDecoder
 {
     // low-allocation: work with Spans & Ranges
@@ -104,6 +107,36 @@ static class PixelFontDecoder
             let chars = from range in letter from c in s[range] select c switch { '#' => pixel, _ => blank }
             select (from item in letters where item.s.SequenceEqual(chars) select (char?)item.c).SingleOrDefault() ?? '?'
         ).Aggregate(new StringBuilder(), (sb, c) => sb.Append(c)).ToString();
+
+    static (string s, char? c)[] letters = new[]
+        {
+            ".##.#..##..######..##..#",
+            "###.#..####.#..##..####.",
+            ".####...#...#...#....###",
+            "###.#..##..##..##..####.",
+            "#####...###.#...#...####",
+            "#####...###.#...#...#...",
+            ".####...#...#.###..#.##.",
+            "#..##..######..##..##..#",
+            "###..#...#...#...#..###.",
+            "..##...#...#...##..#.##.",
+            "#..##.#.##..##..#.#.#..#",
+            "#...#...#...#...#...####",
+            "#..######..##..##..##..#",
+            "#..###.###.##.###.###..#",
+            ".##.#..##..##..##..#.##.",
+            "###.#..##..####.#...#...",
+            ".##.#..##..##..##.##.###",
+            "###.#..##..####.#.#.#..#",
+            ".####...#....##....####.",
+            "####.#...#...#...#...#..",
+            "#..##..##..##..##..#.##.",
+            "#..##..##..#.##..##..##.",
+            "#..##..##..##..######..#",
+            "#..##..#.##.#..##..##..#",
+            "#..##..#.##...#...#..#..",
+            "####...#..#..#..#...####"
+        }.Select((s,i) => (s,(char?)(i+'A'))).ToArray();
 
     private static IEnumerable<IGrouping<int, Range>> FindLetters(string s, int size)
         => from slice in s.Lines()
@@ -165,3 +198,4 @@ static class PixelFontDecoder
         }.Select((s, i) => (s, (char)(i + 'A'))).ToArray();
 
 }
+

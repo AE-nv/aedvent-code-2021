@@ -49,5 +49,12 @@ if __name__ == '__main__':
         else:
             connection[p2]=[p1]
     print(connection)
-    pathways = findPathways(connection,'start')
-    print(len(pathways))
+    #pathways = findPathways(connection,'start')
+    #print(len(pathways))
+
+    cavesI={}
+    for i,k in enumerate(connection.keys()):
+        cavesI[k]=i
+    for k, vs in connection.items():
+        print(list(map(lambda x: cavesI[x], vs)))
+    print('CI:',cavesI)

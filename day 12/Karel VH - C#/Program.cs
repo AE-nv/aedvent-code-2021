@@ -1,80 +1,29 @@
-﻿var input = File.ReadAllLines("input.txt");
-Dictionary<string, Cave> caves = new();
+﻿Dictionary<string, Cave> caves = new();
 
-foreach (string line in input)
-{
-    string cave1Name = line.Split("-")[0];
-    string cave2Name = line.Split("-")[1];
-    if (!caves.ContainsKey(cave1Name))
-        caves.Add(cave1Name, new() { Name = cave1Name });
-    if (!caves.ContainsKey(cave2Name))
-        caves.Add(cave2Name, new() { Name = cave2Name });
-
-    Cave cave1 = caves[cave1Name];
-    Cave cave2 = caves[cave2Name];
-
-    cave1.Neighbors.Add(cave2);
-    cave2.Neighbors.Add(cave1);
-}
-
-List<List<Cave>> routes = new();
-List<List<Cave>> routesLong = new();
-
-foreach (Cave n in caves["start"].Neighbors)
-{
-    List<Cave> route = new();
-    List<Cave> routeLong = new();
-    route.Add(caves["start"]);
-    route.Add(n);
-    routeLong.Add(caves["start"]);
-    routeLong.Add(n);
-    findRoute(routes, new(route), 1);
-    findRoute(routesLong, new(routeLong), 2);
-}
-
-void findRoute(List<List<Cave>> routes, List<Cave> route, int doubleVisits)
-{
-    Cave current = route.Last();
-    Console.WriteLine(string.Join("->", route.Select(x => x.Name)));
-    if (current.Neighbors.Any(x => x.Name.Equals("end")))
+File.ReadLines("input.txt").Select(x => x.Split("-")).Select(x => (c1: new Cave(x[0], char.IsUpper(x[0][0]), new()), c2: new Cave(x[1], char.IsUpper(x[1][0]), new())))
+    .ToList().ForEach(x =>
     {
-        List<Cave> tmpRoute = new(route);
-        tmpRoute.Add(caves["end"]);
-        if (!routes.Any(r => r.SequenceEqual(tmpRoute)))
-        {
-            routes.Add(tmpRoute);
-        }
+        caves.TryAdd(x.c1.Name, x.c1);
+        caves.TryAdd(x.c2.Name, x.c2);
+        caves[x.c1.Name].Neighbors.Add(caves[x.c2.Name]);
+        caves[x.c2.Name].Neighbors.Add(caves[x.c1.Name]);
+    });
 
-    }
-    foreach (Cave n in current.Neighbors)
-    {
-        if (!n.Name.Equals("start") && !n.Name.Equals("end"))
-        {
-            List<Cave> newRoute = new(route);
-            newRoute.Add(n);
-            int appears = route.Count(x => x.Name.Equals(n.Name));
-            if (n.IsLarge || (!n.IsLarge && appears < doubleVisits))
-            {
-                if (!n.IsLarge && appears > 0)
-                    findRoute(routes, newRoute, doubleVisits - 1);
-                else
-                    findRoute(routes, newRoute, doubleVisits);
-            }
-        }
-    }
-}
-
-//This solution takes a mere 5 minutes to compute
-Console.WriteLine((routes.Count, routesLong.Count));
-class Cave
+List<List<Cave>> findRoute(List<List<Cave>> routes, List<Cave> route, int visits)
 {
-    public List<Cave> Neighbors { get; set; } = new();
-    public bool IsLarge => Name.ToUpper().Equals(Name) || Name.Equals("start") || Name.Equals("end");
-    public string Name { get; set; }
-    public bool Visited { get; set; } = false;
+    if (route.Last().Neighbors.Any(x => x.Name.Equals("end")) && !routes.Any(r => r.SequenceEqual(route.Append(caves["end"]))))
+        routes.Add(route.Append(caves["end"]).ToList());
 
-    public bool Equals(Cave c)
+    route.Last().Neighbors.Where(n => !n.Name.Equals("start") && !n.Name.Equals("end")).ToList().ForEach(n =>
     {
-        return Name.Equals(c.Name);
-    }
+        int appears = route.Count(x => x.Name.Equals(n.Name));
+        if (n.IsLarge || (!n.IsLarge && appears < visits))
+            findRoute(routes, new(route.Append(n)), visits - (!n.IsLarge && appears > 0 ? 1 : 0));
+    });
+    return routes;
 }
+
+//This solution only takes a mere 5 minutes to compute
+Console.WriteLine((findRoute(new(), new() { caves["start"] }, 1).Count, findRoute(new(), new() { caves["start"] }, 2).Count));
+
+record Cave(string Name, bool IsLarge, List<Cave> Neighbors);

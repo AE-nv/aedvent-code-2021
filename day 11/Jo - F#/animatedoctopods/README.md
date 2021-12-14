@@ -2,6 +2,10 @@
 
 This is a small Fable app project so you can easily get started and add your own code progressively. For more comprehensive templates [check this page](https://fable.io/docs/2-steps/your-first-fable-project.html).
 
+## Online
+
+Watch this thing animate live on my [personal github page](https://jovaneyck.github.io/animated-octopods/index.html)
+
 ## Requirements
 
 * [dotnet SDK](https://www.microsoft.com/net/download/core) 5.0 or higher

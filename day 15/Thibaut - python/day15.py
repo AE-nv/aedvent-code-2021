@@ -1,14 +1,12 @@
 import numpy as np
 from skimage.graph import route_through_array
 
-def p1(matrix):
+def solve(matrix):
     start=[0,0]
     end=[matrix.shape[0]-1,matrix.shape[1]-1]
     path, score = route_through_array(matrix, start, end, fully_connected=False)
-
-    print("call")
     scoreCheck=sum([matrix[node[0], node[1]] for node in path[1:]])
-    print("p1:",scoreCheck)
+    print(scoreCheck)
 
 if __name__ == '__main__':
     with open("input.txt", 'r') as f:
@@ -27,5 +25,9 @@ if __name__ == '__main__':
                 tmp = np.where(tmp > 9, 1, tmp)
             #print(tmp)
             expandedMatrix[r*100:(r+1)*100,c*100:(c+1)*100]= tmp
-    p1(expandedMatrix)
+
+    print("P1:")
+    solve(matrix)
+    print("P2:")
+    solve(expandedMatrix)
 

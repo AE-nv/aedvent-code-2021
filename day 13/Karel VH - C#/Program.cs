@@ -1,55 +1,32 @@
-﻿var input = File.ReadAllLines("input.txt");
-List<Point> coordinates = new();
-List<Point> foldInstructions = new();
-foreach (string line in input)
-{
-    if (line.StartsWith("fold along y="))
-        foldInstructions.Add(new Point() { X = int.MaxValue, Y = int.Parse(line.Substring(13)) });
-    else if (line.StartsWith("fold along x="))
-        foldInstructions.Add(new Point() { Y = int.MaxValue, X = int.Parse(line.Substring(13)) });
-    else if (!string.IsNullOrWhiteSpace(line))
-        coordinates.Add(new Point() { Y = int.Parse(line.Split(",")[0]), X = int.Parse(line.Split(",")[1]) });
-}
+﻿var input = ReadAllLines("input.txt").ToList();
+List<Point> coordinates = input.Where(x => x.Contains(',')).Select(x => new Point() { Y = int.Parse(x.Split(",")[0]), X = int.Parse(x.Split(",")[1]) }).ToList();
+List<Point> foldInstructions = input.Where(x => x.Contains('='))
+    .Select(x => (v: int.Parse(x[13..]), x: x.Contains('x')))
+    .Select(x => x.x ? new Point() { X = x.v } : new Point() { Y = x.v }).ToList();
+
 Fold(foldInstructions[0]);
-Console.WriteLine(coordinates.Distinct().Count());
-foreach (Point fold in foldInstructions)
-{
-    Fold(fold);
-}
+WriteLine(coordinates.Distinct().Count());
+
+foldInstructions.ForEach(f => Fold(f));
+
 for (int i = 0; i < 7; i++)
 {
     for (int j = 0; j < 45; j++)
-    {
-        if (coordinates.Contains(new Point() { X = i, Y = j }))
-            Console.Write("#");
-        else
-            Console.Write(".");
-    }
-    Console.WriteLine();
+        Write(coordinates.Contains(new Point() { X = i, Y = j }) ? "@" : " ");
+    WriteLine();
 }
-void Fold(Point fold)
+
+void Fold(Point fold) => coordinates.ForEach(x =>
 {
-    coordinates.ForEach(x =>
-    {
-        if (x.Y >= fold.X)
-            x.Y = (fold.X * 2 - x.Y);
-        if (x.X >= fold.Y)
-            x.X = (fold.Y * 2 - x.X);
-    });
-}
+    x.Y = x.Y >= fold.X ? (fold.X * 2 - x.Y) : x.Y;
+    x.X = x.X >= fold.Y ? (fold.Y * 2 - x.X) : x.X;
+});
+
 
 class Point
 {
-    public int X { get; set; }
-    public int Y { get; set; }
-
-    public override bool Equals(object obj)
-    {
-        if (obj is Point o) return o.X == X && o.Y == Y;
-        return false;
-    }
-    public override int GetHashCode()
-    {
-        return X + Y;
-    }
+    public int X { get; set; } = int.MaxValue;
+    public int Y { get; set; } = int.MaxValue;
+    public override bool Equals(object obj) => obj is Point o ? o.X == X && o.Y == Y : false;
+    public override int GetHashCode() => X + Y;
 }

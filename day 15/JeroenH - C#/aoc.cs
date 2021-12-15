@@ -1,17 +1,22 @@
 var input = File.ReadAllLines("input.txt");
 var graph = (
-    from row in input.Select((l, y) => (l, y)) from col in row.l.Select((c, x) => (value: c - '0', x)) select (node: new Node(col.x, row.y), col.value)).ToImmutableDictionary(x => x.node, x => x.value);
-var origin = new(0, 0);
-var target1 = new(input[0].Length - 1, input.Length - 1);
-var target2 = new((target1.x + 1) * 5 - 1, (target1.y + 1) * 5 - 1);
+    from row in input.Select((l, y) => (l, y))
+    from col in row.l.Select((c, x) => (value: c - '0', x))
+    select (node: new Node(col.x, row.y), col.value)
+    ).ToImmutableDictionary(x => x.node, x => x.value);
+
+var origin = new Node(0, 0);
+var target1 = new Node(input[0].Length - 1, input.Length - 1);
+var target2 = new Node((target1.x + 1) * 5 - 1, (target1.y + 1) * 5 - 1);
+
 var part1 = Dijkstra(graph, origin, target1);
 var part2 = Dijkstra(graph.Resize((x: target1.x + 1, y: target1.y + 1)), origin, target2);
+
 Console.WriteLine((part1, part2));
+
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Using_a_priority_queue
 int Dijkstra(ImmutableDictionary<Node, int> graph, Node source, Node target)
 {
-    Console.WriteLine(source);
-    Console.WriteLine(target);
     var queue = new PriorityQueue<Node, int>();
     var costs = new Dictionary<Node, int>();
     costs[source] = 0;

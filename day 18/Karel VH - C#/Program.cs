@@ -1,31 +1,18 @@
 ﻿var inputText = File.ReadAllLines("input.txt");
 var input = inputText.Select(x => CreateNumber(x)).ToList();
 
-Number currentResult = input.First();
-
+Number P1 = input.First();
 //PART 1
 foreach (Number n in input.Skip(1))
 {
-    Number root = new(null, 0);
-    root.N1 = currentResult;
-    root.N2 = n;
-
-    Console.WriteLine("   " + root.N1.ToString());
-    Console.WriteLine("+  " + root.N2.ToString());
-
+    Number root = new(null, 0) { N1 = P1, N2 = n };
     Reduce(root);
-
-    Console.WriteLine("=    " + root.ToString());
-    Console.WriteLine("");
-
-    currentResult = root;
-    currentResult.IncreaseDepth();
+    P1 = root.IncreaseDepth();
 }
-
-Console.WriteLine(currentResult.Magnitude);
+Console.WriteLine(P1.Magnitude);
 
 //PART 2
-long currentMax = 0;
+long P2 = 0;
 for (int i = 0; i < input.Count; i++)
 {
     for (int j = 0; j < input.Count; j++)
@@ -35,16 +22,16 @@ for (int i = 0; i < input.Count; i++)
         root.N1 = CreateNumber(inputText[i]);
         root.N2 = CreateNumber(inputText[j]);
         Reduce(root);
-        if (root.Magnitude > currentMax) currentMax = root.Magnitude;
+        P2 = root.Magnitude > P2 ? root.Magnitude : P2;
     }
 }
-Console.WriteLine(currentMax);
+Console.WriteLine(P2);
 
 void Reduce(Number root)
 {
     //First explode, then keep exploding until we can no longer explode, then split
     //Then do it all again
-    Number? depth4 = root.ToList().Where(x => x.Depth >= 4 && x.Value == null && x.N1.Value != null && x.N2.Value != null).DefaultIfEmpty(null).First();
+    Number? depth4 = getNumberToExplode(root);
     Number? toBeSplit = null;
 
     while (depth4 != null || toBeSplit != null)
@@ -52,94 +39,84 @@ void Reduce(Number root)
         while (depth4 != null)
         {
             Explode(root, depth4);
-            depth4 = root.ToList().Where(x => x.Depth >= 4 && x.Value == null && x.N1.Value != null && x.N2.Value != null).DefaultIfEmpty(null).First();
+            depth4 = getNumberToExplode(root);
         }
-        Split(root);
+        toBeSplit = getNumberToSplit(root);
+        Split(root, toBeSplit);
 
-        depth4 = root.ToList().Where(x => x.Depth >= 4 && x.Value == null && x.N1.Value != null && x.N2.Value != null).DefaultIfEmpty(null).First();
-        toBeSplit = root.ToList().Where(x => x.Value != null && x.Value > 9).DefaultIfEmpty(null).First();
-    }
-}
-
-void Split(Number root)
-{
-    Number toBeSplit = root.ToList().Where(x => x.Value != null && x.Value > 9).DefaultIfEmpty(null).First();
-    if (toBeSplit != null)
-    {
-        //Console.WriteLine("Split : " + toBeSplit.ToString());
-        toBeSplit.N1 = new Number(toBeSplit, toBeSplit.Depth + 1) { Value = (int)Math.Floor((double)toBeSplit.Value / 2.0) };
-        toBeSplit.N2 = new Number(toBeSplit, toBeSplit.Depth + 1) { Value = (int)Math.Ceiling((double)toBeSplit.Value / 2.0) };
-        toBeSplit.Value = null;
-        int sIndex = root.ToList().IndexOf(toBeSplit);
-        //Console.WriteLine("After split: " + root.ToString());
+        depth4 = getNumberToExplode(root);
+        toBeSplit = getNumberToSplit(root);
     }
 }
 
 void Explode(Number root, Number depth4)
 {
     int index = root.ToList().IndexOf(depth4);
-    //Console.WriteLine("Explode : " + depth4.ToString());
     Number? leftNeighbor = index > 0 ? root.ToList()[index - 1] : null;
     if (leftNeighbor != null)
     {
-        while (leftNeighbor != null && leftNeighbor.Value == null && index > 0)
-        {
-            leftNeighbor = index > 0 ? root.ToList()[index - 1] : null;
-            index--;
-        }
+        leftNeighbor = findNeighborWithValue(root, leftNeighbor, index, -1);
+        leftNeighbor.Value += depth4.N1.Value;
     }
 
-    index = root.ToList().IndexOf(depth4);
     Number? rightNeighbor = index < root.ToList().Count - 3 ? root.ToList()[index + 3] : null;
-    index += 2;
     if (rightNeighbor != null)
     {
-        while (rightNeighbor != null && rightNeighbor.Value == null && index > 0)
-        {
-            rightNeighbor = index > 0 ? root.ToList()[index + 1] : null;
-            index++;
-        }
-    }
-
-    if (leftNeighbor != null)
-        leftNeighbor.Value += depth4.N1.Value;
-
-    if (rightNeighbor != null)
+        rightNeighbor = findNeighborWithValue(root, rightNeighbor, index + 2, 1);
         rightNeighbor.Value += depth4.N2.Value;
-
-    depth4.N1.Depth -= 1;
-    depth4.Value = 0;
-    depth4.N1 = null;
-    depth4.N2 = null;
-    //Console.WriteLine("Explode result: " + root.ToString());
-    depth4 = root.ToList().Where(x => x.Depth >= 4 && x.Value == null && x.N1.Value != null && x.N2.Value != null).DefaultIfEmpty(null).First();
+    }
+    depth4.Recreate();
 }
 
+void Split(Number root, Number? toBeSplit)
+{
+    if (toBeSplit == null) return;
+
+    //Console.WriteLine("Split : " + toBeSplit.ToString());
+    toBeSplit.N1 = new Number(toBeSplit, toBeSplit.Depth + 1) { Value = (int)Math.Floor((double)toBeSplit.Value / 2.0) };
+    toBeSplit.N2 = new Number(toBeSplit, toBeSplit.Depth + 1) { Value = (int)Math.Ceiling((double)toBeSplit.Value / 2.0) };
+    toBeSplit.Value = null;
+    int sIndex = root.ToList().IndexOf(toBeSplit);
+    //Console.WriteLine("After split: " + root.ToString());
+
+}
+
+Number? getNumberToSplit(Number root)
+    => root.ToList().Where(x => x.Value != null && x.Value > 9).DefaultIfEmpty(null).First();
+
+Number? getNumberToExplode(Number root)
+    => root.ToList().Where(x => x.Depth >= 4 && x.Value == null && x.N1.Value != null && x.N2.Value != null).DefaultIfEmpty(null).First();
+
+
+Number findNeighborWithValue(Number root, Number leftNeighbor, int index, int step)
+{
+    while (leftNeighbor != null && leftNeighbor.Value == null && index > 0)
+    {
+        leftNeighbor = index > 0 ? root.ToList()[index + step] : null;
+        index += step;
+    }
+    return leftNeighbor;
+}
 
 Number CreateNumber(string line)
 {
     Number root = new(null, 1);
     Number currentNumber = root;
-    //numbersOrdered.Add(currentNumber);
     int depth = 1;
 
-    //Read
     for (int i = 0; i < line.Length; i++)
     {
-
         switch (line[i])
         {
             case '[':
                 depth++;
                 currentNumber.N1 = new Number(currentNumber, depth);
                 currentNumber = currentNumber.N1;
-                //numbersOrdered.Add(currentNumber);
                 break;
 
             case ',':
                 currentNumber.Parent.N2 = new Number(currentNumber.Parent, depth);
                 currentNumber = currentNumber.Parent.N2;
-                //numbersOrdered.Add(currentNumber);
                 break;
 
             case ']':
@@ -162,6 +139,7 @@ class Number
         Parent = parent;
         Depth = depth;
     }
+
     public int Depth { get; set; }
     public Number? N1 { get; set; } = null;
     public Number? N2 { get; set; } = null;
@@ -174,19 +152,25 @@ class Number
 
     public List<Number> ToList()
     {
-        List<Number> result = new();
-        result.Add(this);
-        if (N1 != null)
-            result.AddRange(N1.ToList());
-        if (N2 != null)
-            result.AddRange(N2.ToList());
+        List<Number> result = new() { this };
+        if (N1 != null) result.AddRange(N1.ToList());
+        if (N2 != null) result.AddRange(N2.ToList());
         return result;
     }
 
-    public void IncreaseDepth()
+    public Number IncreaseDepth()
     {
         Depth++;
         if (N1 != null) N1.IncreaseDepth();
         if (N2 != null) N2.IncreaseDepth();
+        return this;
+    }
+
+    public void Recreate()
+    {
+        N1.Depth -= 1;
+        Value = 0;
+        N1 = null;
+        N2 = null;
     }
 }

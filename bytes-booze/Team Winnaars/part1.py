@@ -27,4 +27,3 @@ for command in input:
     programs = partner(programs, left, right)
 
 print(''.join(programs))
-    

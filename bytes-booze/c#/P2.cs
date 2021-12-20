@@ -1,11 +1,14 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
+Stopwatch s = Stopwatch.StartNew();
 string programs = "abcdefghijklmnop";
 
 string[] input = File.ReadAllLines("input.txt").First().Split(",");
 
+List<string> solutions = new();
 
-int nrOfRounds = 10;
+int nrOfRounds = 1000000000;
 for (int i = 0; i < nrOfRounds; i++)
 {
     input.Select(x =>
@@ -25,13 +28,14 @@ for (int i = 0; i < nrOfRounds; i++)
                     }
                     return x;
                 }).ToArray();
+
+    solutions.Add(programs);
     if (programs.Equals("abcdefghijklmnop"))
     {
-        Console.WriteLine("Reset at " + i);
-        i = 999999990 - 1;
-        Console.WriteLine("Skip to " + i);
+        i = 1000000000 - (1000000000 % (i + 1)) - 1;
+        programs = solutions[(1000000000 % (i + 1)) - 1];
+        break;
     }
-
 }
 void SwapChar(char v1, char v2)
 {
@@ -50,8 +54,4 @@ void Spin(int v)
 }
 
 Console.WriteLine(programs);
-//eoagncdkihlmbpfj
-//"ionlbkfeajgdmphc"
-//ojhdkcinglabmefpo/dkcinglabmefp
-
-//eoagncdkihlmbpfj
+Console.WriteLine(s.ElapsedMilliseconds);

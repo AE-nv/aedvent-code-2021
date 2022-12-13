@@ -359,3 +359,5 @@ MigrationBackup/
 
 # Visual studio code config
 .vscode/
+
+input.txt
